@@ -7,7 +7,7 @@ This project is modified from [younghyunjo](https://github.com/younghyunjo/esp32
 
 # Demo
 
-
+![](https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/esp32-homekit.png)
 
 # Resource
 
@@ -40,7 +40,7 @@ To connection WiFi, you MUST config WiFi ssid and password.
 #define EXAMPLE_ESP_WIFI_SSID "12345678"  
 ```
 
-Or you you can change it bia `make menuconfig` and change the `example config`.
+Or you you can change it via `make menuconfig` and change the `example config`.
 
 # Build
 
