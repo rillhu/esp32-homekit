@@ -1,3 +1,10 @@
+#project ignore#
+/**/build/
+/**/*.si4project/
+/**/sdkconfig
+/**/sdkconfig.ci
+/**/sdkconfig.old
+
 # Prerequisites
 *.d
 

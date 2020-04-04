@@ -1,37 +1,59 @@
 # esp32-homekit
 
-#### 介绍
-esp32 apple homekit light switch
+This project is impemented Apple Homekit Accessory Protocol(HAP) to ESP32. You can make your own Homekit accessory with ESP32 with this project.
 
-#### 软件架构
-软件架构说明
+This project is modified from [younghyunjo](https://github.com/younghyunjo/esp32-homekit.git), which is not working on my esp32 devkitc/wrover-kit. So I modify it to make it work on my board.
 
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+# Demo
 
 
-#### 码云特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+# Resource
+
+- [Apple Homekit Accessory Protocol](https://developer.apple.com/support/homekit-accessory-protocol/)
+- [Mongoose](https://github.com/cesanta/mongoose)
+
+# Prerequisite
+The `esp32-homekit` is using esp-idf libraries and build. Please download ESP-IDF and the corresponding compiling tools.
+
+- ESP-IDF
+
+  - Based on [ESP-IDF Release v3.3 (LTS) ](https://github.com/espressif/esp-idf/releases/tag/v3.3),Documentation for release v3.3 is available at https://docs.espressif.com/projects/esp-idf/en/v3.3/ 
+  - This archive can also be downloaded from Espressif's download server:
+    https://dl.espressif.com/dl/esp-idf/releases/esp-idf-v3.3.zip
+
+- Compile tool
+
+  https://dl.espressif.com/dl/esp32_win32_msys2_environment_and_toolchain-20181001.zip
+
+# Configuration
+## WiFi
+esp32-homekit uses WiFi as tranmission layer.
+To connection WiFi, you MUST config WiFi ssid and password.
+
+1. Open examples/switch/main/main.c
+2. Change EXAMPLE_ESP_WIFI_SSID, and EXAMPLE_ESP_WIFI_PASS
+
+```
+#define EXAMPLE_ESP_WIFI_SSID "123"
+#define EXAMPLE_ESP_WIFI_SSID "12345678"  
+```
+
+Or you you can change it bia `make menuconfig` and change the `example config`.
+
+# Build
+
+```
+$ cd examples/switch
+$ make
+$ make flash
+```
+
+# Setup Code
+While pairing accessory and iOS devices, You must enter Setup Code at HOME App.
+The default setupt code is 
+## **`053-58-917`**
+
+Then you can control your device by `Home` app or `Siri`.
+
