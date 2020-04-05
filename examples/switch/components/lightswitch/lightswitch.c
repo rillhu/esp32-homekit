@@ -8,8 +8,8 @@ static const char *TAG = "homekit light/switch";
 
 
 /*Homekit macros*/
-#define ACCESSORY_NAME  "SWITCH"
-#define MANUFACTURER_NAME   "YOUNGHYUN"
+#define ACCESSORY_NAME  "LIGHTSWITCH"
+#define MANUFACTURER_NAME   "Rillhu"
 #define MODEL_NAME  "ESP32_ACC"
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
@@ -95,7 +95,7 @@ void hap_object_init(void* arg)
         {HAP_CHARACTER_MANUFACTURER, (void*)MANUFACTURER_NAME, NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_MODEL, (void*)MODEL_NAME, NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_NAME, (void*)ACCESSORY_NAME, NULL, NULL, NULL, NULL},
-        {HAP_CHARACTER_SERIAL_NUMBER, (void*)"0123456789", NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_SERIAL_NUMBER, (void*)"202004053200", NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_FIRMWARE_REVISION, (void*)"1.0", NULL, NULL, NULL, NULL},
     };
     hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_ACCESSORY_INFORMATION, cs, ARRAY_SIZE(cs));

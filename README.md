@@ -7,7 +7,17 @@ This project is modified from [younghyunjo](https://github.com/younghyunjo/esp32
 
 # Demo
 
+**light/switch**：
+
 ![](https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/esp32-homekit.png)
+
+
+
+temperature/humidity:
+
+
+
+
 
 # Resource
 
