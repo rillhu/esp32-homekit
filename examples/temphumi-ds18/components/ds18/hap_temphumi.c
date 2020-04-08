@@ -43,10 +43,10 @@ void temperature_humidity_monitoring_task(void* arm)
 
     while(1){
         float temp = Read_Temperature();
-        ESP_LOGI(TAG,"B20 Temp: %f *C",temp);
 
         if(temp!=150.0 && temp!=85.0){
             temperature = temp * 100;
+            ESP_LOGI(TAG,"T: %d *C",temperature);
 
         } else{
             ESP_LOGW(TAG,"Read sensor failed, retrying");
@@ -55,11 +55,11 @@ void temperature_humidity_monitoring_task(void* arm)
         //xSemaphoreTake(ev_mutex, 0);
 
 #if 1
-        if (_humidity_ev_handle)
-            hap_event_response(acc_ins, _humidity_ev_handle, (void*)humidity);
+        //if (_humidity_ev_handle)
+        //    hap_event_response(acc_ins, _humidity_ev_handle, (void*)humidity);
 
-        //if (_temperature_ev_handle)
-        //    hap_event_response(acc_ins, _temperature_ev_handle, (void*)temperature);
+        if (_temperature_ev_handle)
+            hap_event_response(acc_ins, _temperature_ev_handle, (void*)temperature);
 
 #endif
         //xSemaphoreGive(ev_mutex);

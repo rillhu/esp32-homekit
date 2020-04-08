@@ -50,14 +50,14 @@ To connection WiFi, you MUST config WiFi ssid and password.
 #define EXAMPLE_ESP_WIFI_SSID "12345678"  
 ```
 
-Or you you can change it via `make menuconfig` and change the `example config`.
+Or you you can change it by`make menuconfig` and change the `App WiFi config`.
 
 # Build
 
 ```
 $ cd examples/switch
-$ make
-$ make flash
+$ make -j8
+$ make flash monitor -j8
 ```
 
 # Setup Code
