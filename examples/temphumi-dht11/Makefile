@@ -3,6 +3,8 @@
 # project subdirectory.
 #
 
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/../../../
-PROJECT_NAME := app-template
+EXTRA_COMPONENT_DIRS += \
+  $(abspath ../../components/homekit)
+
+PROJECT_NAME := homekit-esp32-dht
 include $(IDF_PATH)/make/project.mk

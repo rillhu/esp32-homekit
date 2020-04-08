@@ -3,6 +3,8 @@
 # project subdirectory.
 #
 
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/../../../
-PROJECT_NAME := homekit-esp
+EXTRA_COMPONENT_DIRS += \
+  $(abspath ../../components/homekit)
+
+PROJECT_NAME := homekit-esp32-switch
 include $(IDF_PATH)/make/project.mk

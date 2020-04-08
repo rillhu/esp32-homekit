@@ -68,7 +68,7 @@ void temperature_humidity_monitoring_task(void* arm)
         //xSemaphoreGive(ev_mutex);
 
         printf("%d %d\n", temperature, humidity);
-        vTaskDelay( 30000 / portTICK_RATE_MS );
+        vTaskDelay( 3000 / portTICK_RATE_MS );
     }
 }
 

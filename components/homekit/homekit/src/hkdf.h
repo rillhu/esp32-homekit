@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <wolfssl/wolfcrypt/chacha20_poly1305.h>
+#include "wolfssl/wolfcrypt/chacha20_poly1305.h"
 
 #define HKDF_KEY_LEN      CHACHA20_POLY1305_AEAD_KEYSIZE
 

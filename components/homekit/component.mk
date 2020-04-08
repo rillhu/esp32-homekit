@@ -1,39 +1,46 @@
-COMPONENT_SRCDIRS := src wolfcrypt/src
-COMPONENT_ADD_INCLUDEDIRS := .
-COMPONENT_OBJS := \
-    src/internal.o          \
-    src/io.o                \
-    src/keys.o              \
-    src/ocsp.o              \
-    src/ssl.o               \
-    src/tls.o               \
-    wolfcrypt/src/aes.o     \
-    wolfcrypt/src/arc4.o    \
-    wolfcrypt/src/asn.o     \
-    wolfcrypt/src/chacha.o  \
-    wolfcrypt/src/chacha20_poly1305.o  \
-    wolfcrypt/src/coding.o  \
-    wolfcrypt/src/curve25519.o  \
-    wolfcrypt/src/dh.o      \
-    wolfcrypt/src/ed25519.o \
-    wolfcrypt/src/error.o   \
-    wolfcrypt/src/fe_operations.o   \
-    wolfcrypt/src/ge_operations.o   \
-    wolfcrypt/src/hash.o    \
-    wolfcrypt/src/hmac.o    \
-    wolfcrypt/src/integer.o \
-    wolfcrypt/src/logging.o \
-    wolfcrypt/src/md5.o     \
-    wolfcrypt/src/memory.o  \
-    wolfcrypt/src/poly1305.o  \
-    wolfcrypt/src/random.o  \
-    wolfcrypt/src/rsa.o     \
-    wolfcrypt/src/sha.o     \
-    wolfcrypt/src/sha256.o  \
-    wolfcrypt/src/sha512.o  \
-    wolfcrypt/src/srp.o  \
-    wolfcrypt/src/wc_port.o \
-    wolfcrypt/src/wc_encrypt.o
+COMPONENT_SRCDIRS := homekit/src wolfssl/src wolfssl/wolfcrypt/src
+COMPONENT_ADD_INCLUDEDIRS := homekit/include
+COMPONENT_PRIV_INCLUDEDIRS := wolfssl homekit/src
+
+HOMEKIT_OBJS := $(patsubst %.c,%.o,$(wildcard $(COMPONENT_PATH)/homekit/src/*.c))
+HOMEKIT_OBJS := $(patsubst $(COMPONENT_PATH)/%,%,$(HOMEKIT_OBJS))
+
+WOLFSSL_OBJS := \
+    wolfssl/src/internal.o          \
+    wolfssl/src/io.o                \
+    wolfssl/src/keys.o              \
+    wolfssl/src/ocsp.o              \
+    wolfssl/src/ssl.o               \
+    wolfssl/src/tls.o               \
+    wolfssl/wolfcrypt/src/aes.o     \
+    wolfssl/wolfcrypt/src/arc4.o    \
+    wolfssl/wolfcrypt/src/asn.o     \
+    wolfssl/wolfcrypt/src/chacha.o  \
+    wolfssl/wolfcrypt/src/chacha20_poly1305.o  \
+    wolfssl/wolfcrypt/src/coding.o  \
+    wolfssl/wolfcrypt/src/curve25519.o  \
+    wolfssl/wolfcrypt/src/dh.o      \
+    wolfssl/wolfcrypt/src/ed25519.o \
+    wolfssl/wolfcrypt/src/error.o   \
+    wolfssl/wolfcrypt/src/fe_operations.o   \
+    wolfssl/wolfcrypt/src/ge_operations.o   \
+    wolfssl/wolfcrypt/src/hash.o    \
+    wolfssl/wolfcrypt/src/hmac.o    \
+    wolfssl/wolfcrypt/src/integer.o \
+    wolfssl/wolfcrypt/src/logging.o \
+    wolfssl/wolfcrypt/src/md5.o     \
+    wolfssl/wolfcrypt/src/memory.o  \
+    wolfssl/wolfcrypt/src/poly1305.o  \
+    wolfssl/wolfcrypt/src/random.o  \
+    wolfssl/wolfcrypt/src/rsa.o     \
+    wolfssl/wolfcrypt/src/sha.o     \
+    wolfssl/wolfcrypt/src/sha256.o  \
+    wolfssl/wolfcrypt/src/sha512.o  \
+    wolfssl/wolfcrypt/src/srp.o  \
+    wolfssl/wolfcrypt/src/wc_port.o \
+    wolfssl/wolfcrypt/src/wc_encrypt.o
+
+COMPONENT_OBJS := $(HOMEKIT_OBJS) $(WOLFSSL_OBJS) 
 
 WOLFSSL_SETTINGS =        \
     -DSIZEOF_LONG_LONG=8  \

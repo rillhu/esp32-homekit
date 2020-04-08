@@ -95,7 +95,7 @@ void hap_object_init(void* arg)
         {HAP_CHARACTER_MANUFACTURER, (void*)MANUFACTURER_NAME, NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_MODEL, (void*)MODEL_NAME, NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_NAME, (void*)ACCESSORY_NAME, NULL, NULL, NULL, NULL},
-        {HAP_CHARACTER_SERIAL_NUMBER, (void*)"202004053200", NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_SERIAL_NUMBER, (void*)"202004053201", NULL, NULL, NULL, NULL},
         {HAP_CHARACTER_FIRMWARE_REVISION, (void*)"1.0", NULL, NULL, NULL, NULL},
     };
     hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_ACCESSORY_INFORMATION, cs, ARRAY_SIZE(cs));
@@ -113,7 +113,7 @@ void hap_register_device_handler(char *acc_id)
 
     hap_accessory_callback_t callback;
     callback.hap_object_init = hap_object_init;
-    acc_ins = hap_accessory_register((char*)ACCESSORY_NAME, acc_id, (char*)"053-58-197", (char*)MANUFACTURER_NAME, HAP_ACCESSORY_CATEGORY_OTHER, 811, 1, NULL, &callback);
+    acc_ins = hap_accessory_register((char*)ACCESSORY_NAME, acc_id, (char*)"053-58-191", (char*)MANUFACTURER_NAME, HAP_ACCESSORY_CATEGORY_OTHER, 811, 1, NULL, &callback);
 
 }
 
