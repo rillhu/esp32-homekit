@@ -67,3 +67,11 @@ The default setupt code is
 
 Then you can control your device by `Home` app or `Siri`.
 
+
+
+# makefile的一些说明
+
+- 在$(patsubst %.c,%.o,$(dir) )中，patsubst把$(dir)中的变量符合后缀是.c的全部替换成.o，任何输出。
+
+  > [makefile中的patsubst](https://blog.csdn.net/srw11/article/details/7516712)
+
