@@ -40,10 +40,10 @@ static int _decrypt(struct hap_connection* hc, char* encrypted, int len, char* d
     if (*saveptr == NULL) {
         ptr = (uint8_t*)encrypted;
     }
-    else if (*saveptr < encrypted + len) {
+    else if (*saveptr < (uint8_t*)(encrypted + len)) {
         ptr = *saveptr;
     }
-    else if (*saveptr == encrypted + len){
+    else if (*saveptr == (uint8_t*)(encrypted + len)){
         ESP_LOGI(TAG, "_decrypt end %d", (int)((char*)*saveptr - encrypted));
         return 0;
     }

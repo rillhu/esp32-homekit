@@ -22,6 +22,9 @@ temperature/humidity:
 # Resource
 
 - [Apple Homekit Accessory Protocol](https://developer.apple.com/support/homekit-accessory-protocol/)
+
+  [HAP-Specification-Non-Commercial-Version](https://rillhudev.coding.net/s/a0c7d276-7bb8-4897-a61c-93692fc577b5)
+
 - [Mongoose](https://github.com/cesanta/mongoose)
 
 # Prerequisite

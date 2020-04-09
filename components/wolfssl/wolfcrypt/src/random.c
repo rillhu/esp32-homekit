@@ -1145,7 +1145,8 @@ static int wc_GenerateRand_IntelRD(OS_Seed* os, byte* output, word32 sz)
 
 /* wc_GenerateSeed Implementations */
 #if defined(CUSTOM_RAND_GENERATE_SEED)
-
+    //find this definition @esp-idf-v3.3\components\wpa_supplicant\port\os_xtensa.c
+    extern int os_get_random(unsigned char *buf, size_t len);
     /* Implement your own random generation function
      * Return 0 to indicate success
      * int rand_gen_seed(byte* output, word32 sz);

@@ -111,7 +111,7 @@ static cJSON* _value_to_formatized_json(struct hap_attr_characteristic* c, void*
 {
     switch (c->format) {
         case FORMAT_BOOL:
-            return cJSON_CreateBool(value);
+            return cJSON_CreateBool((cJSON_bool )value);
         case FORMAT_UINT8:
         case FORMAT_UINT32:
         case FORMAT_UINT64:

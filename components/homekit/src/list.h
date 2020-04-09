@@ -52,16 +52,19 @@ struct hlist_node {
  * using the generic single-entry routines.
  */
 
+/*
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
+*/
 
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
 	list->next = list;
 	list->prev = list;
 }
+
 
 /*
  * Insert a new entry between two known consecutive entries.
