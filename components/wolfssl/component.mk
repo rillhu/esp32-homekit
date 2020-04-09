@@ -1,4 +1,4 @@
-COMPONENT_ADD_INCLUDEDIRS := . wolfssl
+COMPONENT_ADD_INCLUDEDIRS := .
 
 COMPONENT_SRCDIRS := src wolfcrypt/src
 
