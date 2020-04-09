@@ -4,6 +4,8 @@
 /**/sdkconfig
 /**/sdkconfig.ci
 /**/sdkconfig.old
+.vscode/
+/**/.vscode/
 
 # Prerequisites
 *.d
