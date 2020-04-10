@@ -113,7 +113,7 @@ void app_main()
     light_io_init();
 
     /*workaround for solving home app cannot display the color permanently*/
-    xTaskCreate( &led_status_report_task, "led_reprt", 2048, NULL, 5, NULL );
+    //xTaskCreate( &led_status_report_task, "led_reprt", 4096, NULL, 5, NULL );
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();

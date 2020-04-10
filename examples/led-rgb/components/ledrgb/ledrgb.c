@@ -215,6 +215,7 @@ void led_hue_write(void* arg, void* value, int len)
         led_update();
     }
 
+    uint16_t hue = led_hue * 100;
     if (hue_ev_handle)
         hap_event_response(acc_ins, hue_ev_handle, (void*)(long)led_hue);
 }
@@ -249,6 +250,8 @@ void led_saturation_write(void* arg, void* value, int len)
         led_update();
     }    
 
+
+    uint16_t saturation = led_saturation * 100;
     if (saturation_ev_handle)
         hap_event_response(acc_ins, saturation_ev_handle, (void*)(long)led_saturation);
 }
