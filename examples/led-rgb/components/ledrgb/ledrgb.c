@@ -1,0 +1,363 @@
+
+#include "esp_log.h"
+#include "driver/gpio.h"
+#include "driver/ledc.h"
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "hap.h"
+
+static const char *TAG = "homekitLed";
+
+
+/*H-S-I*/
+extern int led_on;
+extern uint16_t led_hue;        //0~360
+extern uint16_t led_saturation; //0~100
+extern uint16_t led_brightness; //0~100
+ 
+/*Homekit macros*/
+#define ACCESSORY_NAME  "LED"
+#define MANUFACTURER_NAME   "Rillhu"
+#define MODEL_NAME  "ESP32_ACC"
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+
+/*LEDC macros*/
+#define LEDC_IO_0 (0)   //R
+#define LEDC_IO_1 (2)   //G
+#define LEDC_IO_2 (4)   //B
+
+#define PWM_TARGET_DUTY 8192
+
+void light_io_init(void) //ledc init
+{
+    // enable ledc module
+    periph_module_enable(PERIPH_LEDC_MODULE);
+
+    // config the timer
+    ledc_timer_config_t ledc_timer = {
+        //set timer counter bit number
+        .bit_num = LEDC_TIMER_13_BIT,
+        //set frequency of pwm
+        .freq_hz = 5000,
+        //timer mode,
+        .speed_mode = LEDC_HIGH_SPEED_MODE,
+        //timer index
+        .timer_num = LEDC_TIMER_0
+    };
+    ledc_timer_config(&ledc_timer);
+
+    //config the channel
+    ledc_channel_config_t ledc_channel = {
+        //set LEDC channel 0
+        .channel = LEDC_CHANNEL_0,
+        //set the duty for initialization.(duty range is 0 ~ ((2**bit_num)-1)
+        .duty = 100,
+        //GPIO number
+        .gpio_num = LEDC_IO_0,
+        //GPIO INTR TYPE, as an example, we enable fade_end interrupt here.
+        .intr_type = LEDC_INTR_FADE_END,
+        //set LEDC mode, from ledc_mode_t
+        .speed_mode = LEDC_HIGH_SPEED_MODE,
+        //set LEDC timer source, if different channel use one timer,
+        //the frequency and bit_num of these channels should be the same
+        .timer_sel = LEDC_TIMER_0
+    };
+    //set the configuration
+    ledc_channel_config(&ledc_channel);
+
+    //config ledc channel1
+    ledc_channel.channel = LEDC_CHANNEL_1;
+    ledc_channel.gpio_num = LEDC_IO_1;
+    ledc_channel_config(&ledc_channel);
+    //config ledc channel2
+    ledc_channel.channel = LEDC_CHANNEL_2;
+    ledc_channel.gpio_num = LEDC_IO_2;
+    ledc_channel_config(&ledc_channel);
+}
+
+static bool hsi2rgb(uint16_t h, uint16_t s, uint16_t i, uint8_t *r, uint8_t *g, uint8_t *b)
+{
+    bool res = true;
+    uint16_t hi, F, P, Q, T;
+
+    if (h > 360) return false;
+    if (s > 100) return false;
+    if (i > 100) return false;
+
+    hi = (h / 60) % 6;
+    F = 100 * h / 60 - 100 * hi;
+    P = i * (100 - s) / 100;
+    Q = i * (10000 - F * s) / 10000;
+    T = i * (10000 - s * (100 - F)) / 10000;
+
+    switch (hi) {
+    case 0:
+        *r = i;
+        *g = T;
+        *b = P;
+        break;
+    case 1:
+        *r = Q;
+        *g = i;
+        *b = P;
+        break;
+    case 2:
+        *r = P;
+        *g = i;
+        *b = T;
+        break;
+    case 3:
+        *r = P;
+        *g = Q;
+        *b = i;
+        break;
+    case 4:
+        *r = T;
+        *g = P;
+        *b = i;
+        break;
+    case 5:
+        *r = i;
+        *g = P;
+        *b = Q;
+        break;
+    default:
+        return false;
+    }
+    return res;
+}
+
+static void led_update()
+{
+    uint8_t r,g,b;
+
+    uint16_t brightness = (led_on==true)?led_brightness:0;
+    ESP_LOGI(TAG,"h:%d,s:%d,i:%d,i2:%d", led_hue,led_saturation,led_brightness,brightness);
+    if(!hsi2rgb(led_hue, led_saturation, brightness, &r, &g, &b))
+    {
+        return;
+    }
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, r*PWM_TARGET_DUTY/100);
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1, g*PWM_TARGET_DUTY/100);
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_2, b*PWM_TARGET_DUTY/100);
+    ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
+    ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1);
+    ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_2);
+
+    ESP_LOGI(TAG,"r:%d,g:%d,b:%d", r*PWM_TARGET_DUTY/100, g*PWM_TARGET_DUTY/100, b*PWM_TARGET_DUTY/100);
+}
+
+
+/*--------------------------homekit-----------------------------*/
+static void* acc_ins;  //accessory instance
+
+/*LED ON 'service'*/
+static void* _ev_handle;
+int led_on = false;
+void* led_on_read(void* arg)
+{
+    ESP_LOGI(TAG,"on read");
+    return (void*)led_on;
+}
+
+
+void led_on_write(void* arg, void* value, int len)
+{
+    ESP_LOGI(TAG,"on write %d, bright: %d", (int)value, led_brightness);
+    led_on = (int)value;
+    if (value) {
+        led_on = true;
+    }
+    else {
+        led_on = false;
+    }
+
+    led_update();
+
+    if (_ev_handle)
+        hap_event_response(acc_ins, _ev_handle, (void*)led_on);
+
+    return;
+}
+
+
+void led_on_notify(void* arg, void* ev_handle, bool enable)
+{
+    ESP_LOGI(TAG,"on noti: %d", enable);
+    if (enable) {
+        _ev_handle = ev_handle;
+    }
+    else {
+        _ev_handle = NULL;
+    }
+}
+
+
+static bool _identifed = false;
+void* identify_read(void* arg)
+{
+    return (void*)true;
+}
+
+
+/*LED hue 'service'*/
+static void* hue_ev_handle;
+uint16_t led_hue;     // hue is scaled 0 to 360
+void led_hue_write(void* arg, void* value, int len)
+{
+    led_hue = (int)(value);
+    ESP_LOGI(TAG,"hue write %d",led_hue);
+    //ESP_LOGI(TAG,"hue write2 %f",(float)(value));
+
+    if(led_on==true){
+        led_update();
+    }
+
+    if (hue_ev_handle)
+        hap_event_response(acc_ins, hue_ev_handle, (void*)(long)led_hue);
+}
+
+void* led_hue_read(void* arg)
+{
+    ESP_LOGI(TAG,"hue read");
+    return (void*)(long)led_hue;
+}
+
+void led_hue_notify(void* arg, void* ev_handle, bool enable)
+{
+    ESP_LOGI(TAG,"hue noti");
+    if (enable) {
+        hue_ev_handle = ev_handle;
+    }
+    else {
+        hue_ev_handle = NULL;
+    }
+}
+
+/*LED saturation 'service'*/
+static void* saturation_ev_handle;
+uint16_t led_saturation;     // saturation is scaled 0 to 100
+void led_saturation_write(void* arg, void* value, int len)
+{
+    led_saturation = (int)(value);
+    ESP_LOGI(TAG,"saturation write %d",led_saturation);
+    //ESP_LOGI(TAG,"saturation write2 %f",(float)(value));
+
+    if(led_on){
+        led_update();
+    }    
+
+    if (saturation_ev_handle)
+        hap_event_response(acc_ins, saturation_ev_handle, (void*)(long)led_saturation);
+}
+
+void* led_saturation_read(void* arg)
+{
+    ESP_LOGI(TAG,"saturation read");
+    return (void*)(long)led_saturation;
+}
+
+void led_saturation_notify(void* arg, void* ev_handle, bool enable)
+{
+    ESP_LOGI(TAG,"saturation noti");
+    if (enable) {
+        saturation_ev_handle = ev_handle;
+    }
+    else {
+        saturation_ev_handle = NULL;
+    }
+}
+
+/*LED brightness 'service'*/
+static void* brightness_ev_handle;
+uint16_t led_brightness;     // brightness is scaled 0 to 100
+void led_brightness_write(void* arg, void* value, int len)
+{
+    led_brightness = (int)(value);
+    ESP_LOGI(TAG,"brightness write %d",led_brightness);
+
+    if(led_on==true){
+        led_update();
+    }
+
+    if (brightness_ev_handle)
+        hap_event_response(acc_ins, brightness_ev_handle, (void*)(long)led_brightness);
+}
+
+void* led_brightness_read(void* arg)
+{
+    ESP_LOGI(TAG,"brightness read");
+    return (void*)(long)led_brightness;
+}
+
+void led_brightness_notify(void* arg, void* ev_handle, bool enable)
+{
+    ESP_LOGI(TAG,"brightness noti");
+    if (enable) {
+        brightness_ev_handle = ev_handle;
+    }
+    else {
+        brightness_ev_handle = NULL;
+    }
+}
+
+
+/*periodically report led's status to homekit*/
+void led_status_report_task(void* arm)
+{
+    while(1){       
+        if (led_on==true){
+            if (hue_ev_handle){
+                hap_event_response(acc_ins, hue_ev_handle, (void*)(long)led_hue);
+            }
+
+            if (saturation_ev_handle){
+                hap_event_response(acc_ins, saturation_ev_handle, (void*)(long)led_saturation);
+            }
+
+            if (brightness_ev_handle){
+                hap_event_response(acc_ins, brightness_ev_handle, (void*)(long)led_brightness);  
+            }
+        }
+        vTaskDelay( 3000 / portTICK_RATE_MS );
+    }
+}
+
+
+/*HAP object init*/
+void hap_object_init(void* arg)
+{
+    void* accessory_object = hap_accessory_add(acc_ins);
+    struct hap_characteristic cs[] = {
+        {HAP_CHARACTER_IDENTIFY, (void*)true, NULL, identify_read, NULL, NULL},
+        {HAP_CHARACTER_MANUFACTURER, (void*)MANUFACTURER_NAME, NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_MODEL, (void*)MODEL_NAME, NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_NAME, (void*)ACCESSORY_NAME, NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_SERIAL_NUMBER, (void*)"202004053201", NULL, NULL, NULL, NULL},
+        {HAP_CHARACTER_FIRMWARE_REVISION, (void*)"1.0", NULL, NULL, NULL, NULL},
+    };
+    hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_ACCESSORY_INFORMATION, cs, ARRAY_SIZE(cs));
+
+    struct hap_characteristic cd[] = {
+        {HAP_CHARACTER_ON, (void*)led_on, NULL, led_on_read, led_on_write, led_on_notify},
+        {HAP_CHARACTER_HUE, (void*)(long)led_hue, NULL, led_hue_read, led_hue_write, led_hue_notify},
+        {HAP_CHARACTER_SATURATION, (void*)(long)led_saturation, NULL, led_saturation_read, led_saturation_write, led_saturation_notify},
+        {HAP_CHARACTER_BRIGHTNESS, (void*)(long)led_brightness, NULL, led_brightness_read, led_brightness_write, led_brightness_notify},
+    };
+    hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_LIGHTBULB, cd, ARRAY_SIZE(cd));
+}
+
+
+/*Interface for app_main*/
+void hap_register_device_handler(char *acc_id)
+{
+    hap_init();
+
+    hap_accessory_callback_t callback;
+    callback.hap_object_init = hap_object_init;
+    acc_ins = hap_accessory_register((char*)ACCESSORY_NAME, acc_id, (char*)"111-11-132", (char*)MANUFACTURER_NAME, HAP_ACCESSORY_CATEGORY_LIGHTBULB, 811, 1, NULL, &callback);
+}
+
+

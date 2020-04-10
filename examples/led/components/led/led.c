@@ -16,7 +16,6 @@ extern int led_brightness;
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 /*LEDC macros*/
-#define LEDC_CHANNEL_0 0
 #define LEDC_IO_0 (2)
 #define PWM_TARGET_DUTY 8192
 
@@ -123,8 +122,8 @@ void led_brightness_write(void* arg, void* value, int len)
     ESP_LOGI(TAG,"brightness write %d",led_brightness);
     ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, led_brightness*PWM_TARGET_DUTY/100);
     ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
-    if (_ev_handle)
-    hap_event_response(acc_ins, _ev_handle, (void*)led_brightness);
+    if (brightness_ev_handle)
+    hap_event_response(acc_ins, brightness_ev_handle, (void*)led_brightness);
 
 }
 
