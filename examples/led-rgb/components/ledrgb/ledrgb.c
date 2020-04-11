@@ -217,7 +217,7 @@ void led_hue_write(void* arg, void* value, int len)
 
     uint16_t hue = led_hue * 100;
     if (hue_ev_handle)
-        hap_event_response(acc_ins, hue_ev_handle, (void*)(long)led_hue);
+        hap_event_response(acc_ins, hue_ev_handle, (void*)(long)hue);
 }
 
 void* led_hue_read(void* arg)
@@ -250,10 +250,9 @@ void led_saturation_write(void* arg, void* value, int len)
         led_update();
     }    
 
-
     uint16_t saturation = led_saturation * 100;
     if (saturation_ev_handle)
-        hap_event_response(acc_ins, saturation_ev_handle, (void*)(long)led_saturation);
+        hap_event_response(acc_ins, saturation_ev_handle, (void*)(long)saturation);
 }
 
 void* led_saturation_read(void* arg)
@@ -285,8 +284,9 @@ void led_brightness_write(void* arg, void* value, int len)
         led_update();
     }
 
+    uint16_t brightness = led_brightness * 100;
     if (brightness_ev_handle)
-        hap_event_response(acc_ins, brightness_ev_handle, (void*)(long)led_brightness);
+        hap_event_response(acc_ins, brightness_ev_handle, (void*)(long)brightness);
 }
 
 void* led_brightness_read(void* arg)
@@ -306,7 +306,7 @@ void led_brightness_notify(void* arg, void* ev_handle, bool enable)
     }
 }
 
-
+#if 0
 /*periodically report led's status to homekit*/
 void led_status_report_task(void* arm)
 {
@@ -327,7 +327,7 @@ void led_status_report_task(void* arm)
         vTaskDelay( 3000 / portTICK_RATE_MS );
     }
 }
-
+#endif
 
 /*HAP object init*/
 void hap_object_init(void* arg)
