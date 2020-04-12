@@ -5,7 +5,7 @@
 
 #include "hap.h"
 
-static const char *TAG = "homekit led";
+static const char *TAG = "homekit ledc";
 
 extern int led_brightness;
 
@@ -16,7 +16,8 @@ extern int led_brightness;
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 /*LEDC macros*/
-#define LEDC_IO_0 (2)
+#define LEDC_IO_0 (18)
+#define LEDC_IO_1 (19)
 #define PWM_TARGET_DUTY 8192
 
 void light_io_init(void) //ledc init
@@ -55,6 +56,11 @@ void light_io_init(void) //ledc init
     };
     //set the configuration
     ledc_channel_config(&ledc_channel);
+
+    //config ledc channel1
+    ledc_channel.channel = LEDC_CHANNEL_1;
+    ledc_channel.gpio_num = LEDC_IO_1;
+    ledc_channel_config(&ledc_channel);
 }
 
 /*--------------------------------------------------------------*/
@@ -62,11 +68,11 @@ static void* acc_ins;
 
 /*LED ON 'service'*/
 static void* _ev_handle;
-static int led = false;
+static int led_on = false;
 void* led_on_read(void* arg)
 {
     ESP_LOGI(TAG,"LED READ\n");
-    return (void*)led;
+    return (void*)led_on;
 }
 
 
@@ -74,22 +80,28 @@ void led_on_write(void* arg, void* value, int len)
 {
    ESP_LOGI(TAG,"LED WRITE. %d, brigh: %d\n", (int)value, led_brightness);
 
-    led = (int)value;
+    led_on = (int)value;
     if (value) {
-        led = true;
-        //gpio_set_level(LED_G, 1);
+        led_on = true;
+        //LED channel 0
         ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, led_brightness*PWM_TARGET_DUTY/100);
         ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
+         //LED channel 1
+        ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1, led_brightness*PWM_TARGET_DUTY/100);
+        ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1);
     }
     else {
-        led = false;
-        //gpio_set_level(LED_G, 0);
+        led_on = false;
+        //LED channel 0
         ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 0);
         ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
+        //LED channel 1
+        ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1, 0);
+        ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_1);
     }
 
     if (_ev_handle)
-        hap_event_response(acc_ins, _ev_handle, (void*)led);
+        hap_event_response(acc_ins, _ev_handle, (void*)led_on);
 
     return;
 }
@@ -159,7 +171,7 @@ void hap_object_init(void* arg)
     hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_ACCESSORY_INFORMATION, cs, ARRAY_SIZE(cs));
 
     struct hap_characteristic cd[] = {
-        {HAP_CHARACTER_ON, (void*)led, NULL, led_on_read, led_on_write, led_on_notify},
+        {HAP_CHARACTER_ON, (void*)led_on, NULL, led_on_read, led_on_write, led_on_notify},
         {HAP_CHARACTER_BRIGHTNESS, (void*)led_brightness, NULL, led_brightness_read, led_brightness_write, led_brightness_notify},
     };
     hap_service_and_characteristics_add(acc_ins, accessory_object, HAP_SERVICE_LIGHTBULB, cd, ARRAY_SIZE(cd));
