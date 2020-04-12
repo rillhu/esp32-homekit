@@ -5,7 +5,8 @@
 
 EXTRA_COMPONENT_DIRS += \
     $(abspath ../../components/wolfssl)\
-    $(abspath ../../components/homekit)
+    $(abspath ../../components/homekit) \
+    $(abspath ../../components/ds18b20) 
 
-PROJECT_NAME := homekit-esp32-dht
+PROJECT_NAME := homekit-esp32-ds
 include $(IDF_PATH)/make/project.mk
