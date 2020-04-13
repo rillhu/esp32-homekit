@@ -5,19 +5,27 @@ This project is impemented Apple Homekit Accessory Protocol(HAP) to ESP32. You c
 This project is modified from [younghyunjo](https://github.com/younghyunjo/esp32-homekit.git), which is not working on my esp32 devkitc/wrover-kit. So I modify it to make it work on my board.
 
 
-# Demo
+# Examples(new)
 
-**light/switch**：
+**examples/led:**
 
-![](https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/esp32-homekit.png)
+Using LEDC to control the light, which can dim the brightness.
 
+**examples/led-rgb:**
 
+Using LEDC to control the light, which can dim the brightness and the light color. This case uses the hsi2rgb algorithm, which is referred to [lightbulb.c](https://github.com/espressif/esp-aliyun/blob/master/examples/solutions/smart_light/components/lightbulb/lightbulb.c).
 
-temperature/humidity:
+<img src="https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/esp32-homekit.png" style="zoom: 67%;" />
 
+**examples/led-strip:**
 
+refer to [ESP32-NeoPixel-WS2812-RMT](https://github.com/JSchaenzle/ESP32-NeoPixel-WS2812-RMT), and implement the led strip control.
 
+**examples/temphumi-ds18-gpu:**
 
+Using serial port LCD to display the status and connect to homekit.
+
+<img src="https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/20200328-04.png" style="zoom: 50%;" />
 
 # Resource
 
