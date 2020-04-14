@@ -97,17 +97,10 @@ static void led_update()
     b = b*255/100;
     ESP_LOGI(TAG,"r:%d,g:%d,b:%d", r, g, b);
 
-    //rgbVal color = makeRGBVal(r, g, b); 
-    //for (uint8_t i = 0; i < pixel_count; i++)
-    //{
-    //  pixels[i] = color;
-    //}
-   // ws2812_setColors(pixel_count, pixels);
-
     struct led_state new_state;
     for (size_t i = 0; i < NUM_LEDS; i++)
     {
-        new_state.leds[i] = g<<16|r<<8|b;
+        new_state.leds[i] = g<<16|r<<8|b; //GRB
     }
     
     ws2812_write_leds(new_state);

@@ -25,7 +25,7 @@ refer to [ESP32-NeoPixel-WS2812-RMT](https://github.com/JSchaenzle/ESP32-NeoPixe
 
 Using serial port LCD to display the status and connect to homekit.
 
-<img src="https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/20200328-04.png" style="zoom: 50%;" />
+![](https://rillhudev.coding.net/p/blogres/d/blogres/git/raw/master/20200328-04.png)
 
 # Resource
 
